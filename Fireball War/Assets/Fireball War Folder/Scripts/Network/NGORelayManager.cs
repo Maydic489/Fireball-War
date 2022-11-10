@@ -42,10 +42,14 @@ public class NGORelayManager : MonoBehaviour
 
     public void JoiningRelay()
     {
-        if (string.IsNullOrEmpty(RelayJoinCode))
+        if (string.IsNullOrEmpty(MainHostUIController.Instance.roomCodeInputField.text))
         {
             Debug.Log("No Join Code!");
             return;
+        }
+        else
+        {
+            RelayJoinCode = MainHostUIController.Instance.roomCodeInputField.text;
         }
         Example_AuthenticatingAPlayer();
         StartCoroutine(Example_ConfigreTransportAndStartNgoAsConnectingPlayer());
@@ -125,6 +129,9 @@ public class NGORelayManager : MonoBehaviour
 
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
         NetworkManager.Singleton.StartHost();
+
+        MainHostUIController.Instance.hostRoomCode.text = RelayJoinCode;
+
         yield return null;
     }
 
