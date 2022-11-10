@@ -623,11 +623,11 @@ PlayerSettings:
     m_VersionName: 
   apiCompatibilityLevel: 6
   activeInputHandler: 0
-  cloudProjectId: 
+  cloudProjectId: 681ef253-21c0-424d-8729-8b2649ba8a79
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: Fireball War
+  organizationId: banana-juice-games
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
