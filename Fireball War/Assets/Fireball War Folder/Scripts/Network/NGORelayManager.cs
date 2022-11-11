@@ -19,6 +19,7 @@ public class NGORelayManager : MonoBehaviour
 {
     const int m_MaxConnections = 4;
 
+    string playerAuthenID;//not use currently
     public string RelayJoinCode;
 
     public static NGORelayManager Instance { get; private set; }
@@ -36,15 +37,21 @@ public class NGORelayManager : MonoBehaviour
 
     public void StartHostRelay()
     {
+        if (string.IsNullOrEmpty(MainHostUIController.Instance.playerNameInputField.text))
+        {
+            Debug.Log("Enter Name!");
+            return;
+        }
+
         Example_AuthenticatingAPlayer();
         StartCoroutine(Example_ConfigureTransportAndStartNgoAsHost());
     }
 
     public void JoiningRelay()
     {
-        if (string.IsNullOrEmpty(MainHostUIController.Instance.roomCodeInputField.text))
+        if (string.IsNullOrEmpty(MainHostUIController.Instance.roomCodeInputField.text) || string.IsNullOrEmpty(MainHostUIController.Instance.playerNameInputField.text))
         {
-            Debug.Log("No Join Code!");
+            Debug.Log("Enter Join Code or Name!");
             return;
         }
         else
@@ -61,8 +68,8 @@ public class NGORelayManager : MonoBehaviour
         {
             await UnityServices.InitializeAsync();
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            var playerID = AuthenticationService.Instance.PlayerId;
-            Debug.Log("Authen with Player ID " + playerID);
+            playerAuthenID = AuthenticationService.Instance.PlayerId;
+            Debug.Log("Authen with Player ID " + playerAuthenID);
         }
         catch (Exception e)
         {
@@ -130,7 +137,17 @@ public class NGORelayManager : MonoBehaviour
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
         NetworkManager.Singleton.StartHost();
 
+        while(!NetworkManager.Singleton.IsHost)//wait for connection
+        {
+            yield return null;
+        }
+
+        MainHostUIController.Instance.localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>();
+        MainHostUIController.Instance.localPlayer.SetPlayerNameServerRpc(MainHostUIController.Instance.playerNameInputField.text);
+        MainHostUIController.Instance.HideHostingUI();
+        MainHostUIController.Instance.ShowWaitingRoomUI();
         MainHostUIController.Instance.hostRoomCode.text = RelayJoinCode;
+        MainHostUIController.Instance.CopyRoomCodeToClipboard();
 
         yield return null;
     }
@@ -181,6 +198,17 @@ public class NGORelayManager : MonoBehaviour
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
         NetworkManager.Singleton.StartClient();
+
+        while(!NetworkManager.Singleton.IsConnectedClient)
+        {
+            yield return null;
+        }
+
+        MainHostUIController.Instance.localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>();
+        MainHostUIController.Instance.localPlayer.SetPlayerNameServerRpc(MainHostUIController.Instance.playerNameInputField.text);
+        MainHostUIController.Instance.HideHostingUI();
+        MainHostUIController.Instance.ShowWaitingRoomUI();
+
         yield return null;
     }
 }
