@@ -1907,6 +1907,10 @@ PrefabInstance:
       propertyPath: player2
       value: 
       objectReference: {fileID: 1396504878}
+    - target: {fileID: 3583125347955358560, guid: 563f5cc4650c44f4d9c92d1dc8af6d4d, type: 3}
+      propertyPath: isOnlinePlay
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3583125347955358561, guid: 563f5cc4650c44f4d9c92d1dc8af6d4d, type: 3}
       propertyPath: m_Name
       value: GameManager

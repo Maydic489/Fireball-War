@@ -6,11 +6,41 @@ using Unity.Netcode;
 
 public class PlayerNetwork : NetworkBehaviour
 {
+    string currentInput;
+
     public NetworkVariable<FixedString128Bytes> playerName = new NetworkVariable<FixedString128Bytes>();
 
     private void Start()
     {
 
+    }
+
+    private void Update()
+    {
+        if(IsLocalPlayer && IsClient)
+        {
+            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Joystick1Button2))
+            {
+                currentInput = "fb1";
+            }
+            else if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Joystick1Button3))
+            {
+                currentInput = "fb2";
+            }
+            else
+            {
+                currentInput = "";
+            }
+
+            if (!string.IsNullOrEmpty(currentInput))
+                SendInputServerRpc(currentInput, IsHost);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SendInputServerRpc(string currentInput, bool isPlayer1)
+    {
+        MainNetworkGameManager.Instance.UpdatePlayerInputClientRpc(currentInput, isPlayer1);
     }
 
     public override void OnNetworkSpawn()

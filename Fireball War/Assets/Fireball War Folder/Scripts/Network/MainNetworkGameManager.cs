@@ -8,6 +8,9 @@ public class MainNetworkGameManager : NetworkBehaviour
     [HideInInspector]
     public PlayerNetwork localPlayer;
 
+    public string p1CurrentInput;
+    public string p2CurrentInput;
+
     public static MainNetworkGameManager Instance { get; private set; }
     private void Awake()
     {
@@ -26,7 +29,10 @@ public class MainNetworkGameManager : NetworkBehaviour
     private void OnLevelWasLoaded(int level)
     {
         if (IsHost || IsClient)
+        {
             Time.timeScale = 0;
+            StartCoroutine(ClearCurrentInput());
+        }
     }
 
     public override void OnNetworkSpawn()
@@ -56,5 +62,31 @@ public class MainNetworkGameManager : NetworkBehaviour
     void ResumeGameServerRpc()
     {
         Time.timeScale = 1;
+    }
+
+    [ClientRpc]
+    public void UpdatePlayerInputClientRpc(string newInput,bool isPlayer1)
+    {
+        if (isPlayer1)
+            p1CurrentInput = newInput;
+        else
+            p2CurrentInput = newInput;
+    }
+
+    IEnumerator ClearCurrentInput()
+    {
+        while (true)
+        {
+            yield return new WaitForEndOfFrame();
+
+            p1CurrentInput = "";
+            p2CurrentInput = "";
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RestartGamePlayServerRpc()
+    {
+        NetworkManager.SceneManager.LoadScene("Gameplay", UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
 }

@@ -16,6 +16,8 @@ public class MainGameManager : MonoBehaviour
     GameObject hitEffect;
     GameObject hitEffectObj;
 
+    public bool isOnlinePlay;
+
     Coroutine countImpactFrameCo;
 
     [HideInInspector]

@@ -60,51 +60,99 @@ public class PlayerController : MonoBehaviour
         if (_state != PlayerState.idle || _state == PlayerState.hit || MainGameManager.Instance._gameState != MainGameManager.GameState.Fighting)
             return;
 
-        if (isPlayer1Side)
+        if (!MainGameManager.Instance.isOnlinePlay)
         {
-            if (!activeFireBall)
+            if (isPlayer1Side)
             {
-                if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Joystick1Button2))
+                if (!activeFireBall)
                 {
-                    InputFireBall(0);
+                    if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Joystick1Button2))
+                    {
+                        InputFireBall(0);
+                    }
+                    else if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Joystick1Button3))
+                    {
+                        InputFireBall(1);
+                    }
                 }
-                else if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Joystick1Button3))
+                else
                 {
-                    InputFireBall(1);
+                    if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Joystick1Button2) || Input.GetKeyDown(KeyCode.Joystick1Button3))
+                    {
+                        whiffCo = StartCoroutine(WhiffAttack());
+                    }
                 }
             }
             else
             {
-                if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Joystick1Button2) || Input.GetKeyDown(KeyCode.Joystick1Button3))
+                if (!activeFireBall)
                 {
-                    whiffCo = StartCoroutine(WhiffAttack());
+                    if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.Joystick2Button2))
+                    {
+                        InputFireBall(0);
+                    }
+                    else if (Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.Joystick2Button3))
+                    {
+                        InputFireBall(1);
+                    }
+                }
+                else
+                {
+                    if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.Joystick2Button2) || Input.GetKeyDown(KeyCode.Joystick2Button3))
+                    {
+                        whiffCo = StartCoroutine(WhiffAttack());
+                    }
                 }
             }
         }
-        else
+        else//is online play
         {
-            if (!activeFireBall)
+            if (isPlayer1Side)
             {
-                if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.Joystick2Button2))
+                if (!activeFireBall)
                 {
-                    InputFireBall(0);
+                    if (MainNetworkGameManager.Instance.p1CurrentInput == "fb1")
+                    {
+                        InputFireBall(0);
+                    }
+                    else if (MainNetworkGameManager.Instance.p1CurrentInput == "fb2")
+                    {
+                        InputFireBall(1);
+                    }
                 }
-                else if (Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.Joystick2Button3))
+                else
                 {
-                    InputFireBall(1);
+                    if (MainNetworkGameManager.Instance.p1CurrentInput != "")
+                    {
+                        whiffCo = StartCoroutine(WhiffAttack());
+                    }
                 }
             }
             else
             {
-                if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.Joystick2Button2) || Input.GetKeyDown(KeyCode.Joystick2Button3))
+                if (!activeFireBall)
                 {
-                    whiffCo = StartCoroutine(WhiffAttack());
+                    if (MainNetworkGameManager.Instance.p2CurrentInput == "fb1")
+                    {
+                        InputFireBall(0);
+                    }
+                    else if (MainNetworkGameManager.Instance.p2CurrentInput == "fb2")
+                    {
+                        InputFireBall(1);
+                    }
+                }
+                else
+                {
+                    if (MainNetworkGameManager.Instance.p2CurrentInput != "")
+                    {
+                        whiffCo = StartCoroutine(WhiffAttack());
+                    }
                 }
             }
         }
     }
 
-    void InputFireBall(int fbIndex)
+    public void InputFireBall(int fbIndex)
     {
         _state = PlayerState.attack;
         _prefabs.PlayAnimation("attack_normal");
@@ -231,6 +279,9 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.5f);
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (!MainGameManager.Instance.isOnlinePlay)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        else
+            MainNetworkGameManager.Instance.RestartGamePlayServerRpc();
     }
 }
