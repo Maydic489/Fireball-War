@@ -17,7 +17,7 @@ using NetworkEvent = Unity.Networking.Transport.NetworkEvent;
 
 public class NGORelayManager : MonoBehaviour
 {
-    const int m_MaxConnections = 4;
+    const int m_MaxConnections = 2;
 
     string playerAuthenID;//not use currently
     public string RelayJoinCode;
@@ -69,7 +69,7 @@ public class NGORelayManager : MonoBehaviour
             await UnityServices.InitializeAsync();
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             playerAuthenID = AuthenticationService.Instance.PlayerId;
-            Debug.Log("Authen with Player ID " + playerAuthenID);
+            //Debug.Log("Authen with Player ID " + playerAuthenID);
         }
         catch (Exception e)
         {
@@ -91,13 +91,13 @@ public class NGORelayManager : MonoBehaviour
             throw;
         }
 
-        Debug.Log($"server: {allocation.ConnectionData[0]} {allocation.ConnectionData[1]}");
-        Debug.Log($"server: {allocation.AllocationId}");
+        //Debug.Log($"server: {allocation.ConnectionData[0]} {allocation.ConnectionData[1]}");
+        Debug.Log($"server: {allocation.AllocationId} {allocation.Region}");
 
         try
         {
             createJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-            Debug.Log("Join Code is " + createJoinCode);
+            //Debug.Log("Join Code is " + createJoinCode);
             NGORelayManager.Instance.RelayJoinCode = createJoinCode;
         }
         catch
@@ -121,7 +121,7 @@ public class NGORelayManager : MonoBehaviour
             yield return null;
         }
 
-        var serverRelayUtilityTask = AllocateRelayServerAndGetJoinCode(m_MaxConnections);
+        var serverRelayUtilityTask = AllocateRelayServerAndGetJoinCode(m_MaxConnections/*, "asia-southeast1"*/);
         while (!serverRelayUtilityTask.IsCompleted)
         {
             yield return null;
@@ -165,9 +165,9 @@ public class NGORelayManager : MonoBehaviour
             throw;
         }
 
-        Debug.Log($"client: {allocation.ConnectionData[0]} {allocation.ConnectionData[1]}");
-        Debug.Log($"host: {allocation.HostConnectionData[0]} {allocation.HostConnectionData[1]}");
-        Debug.Log($"client: {allocation.AllocationId}");
+        //Debug.Log($"client: {allocation.ConnectionData[0]} {allocation.ConnectionData[1]}");
+        //Debug.Log($"host: {allocation.HostConnectionData[0]} {allocation.HostConnectionData[1]}");
+        //Debug.Log($"client: {allocation.AllocationId}");
 
         return new RelayServerData(allocation, "dtls");
     }

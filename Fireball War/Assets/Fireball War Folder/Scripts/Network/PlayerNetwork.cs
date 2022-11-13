@@ -15,14 +15,12 @@ public class PlayerNetwork : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        Debug.Log("On spawn");
         base.OnNetworkSpawn();
         if (IsOwner)
             return;
 
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "HostScene")
         {
-            Debug.Log("host scene");
             MainHostUIController.Instance.SetPlayerSlotName(playerName.Value.ToString(), NetworkObject.IsOwnedByServer);
         }
     }
@@ -44,7 +42,6 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "HostScene")
         {
-            Debug.Log("set from relay");
             MainHostUIController.Instance.SetPlayerSlotName(playerName, NetworkObject.IsOwnedByServer);
         }
     }

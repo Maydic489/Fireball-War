@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using Unity.Netcode;
+using System;
 
 public class MainHostUIController : NetworkBehaviour
 {
@@ -13,6 +15,8 @@ public class MainHostUIController : NetworkBehaviour
     GameObject hostingUIGroup;
     [SerializeField]
     GameObject waitingRoomUIGroup;
+    [SerializeField]
+    Button startButton;
     [SerializeField]
     GameObject PlayerSlot;
     [SerializeField]
@@ -40,8 +44,23 @@ public class MainHostUIController : NetworkBehaviour
     private void Start()
     {
         Application.targetFrameRate = 60;
+        NetworkManager.Singleton.OnClientConnectedCallback += OnNewPlayerConnect;
     }
 
+    void OnNewPlayerConnect(ulong clientId)
+    {
+        if (IsClient && !IsServer)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnNewPlayerConnect;
+        }
+
+        if (IsHost && NetworkManager.Singleton.ConnectedClientsIds.Count > 1)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnNewPlayerConnect;
+
+            startButton.interactable = true;
+        }
+    }
 
     public void HideHostingUI()
     {
@@ -63,16 +82,12 @@ public class MainHostUIController : NetworkBehaviour
 
     public void SetPlayerSlotName(string authenID, bool isTheHost)
     {
-        Debug.Log("is check");
-
         if (isTheHost)
         {
-            Debug.Log("is host");
             p1Name.text = authenID;
         }
         else if(!isTheHost)
         {
-            Debug.Log("is client");
             p2Name.text = authenID;
         }
     }
