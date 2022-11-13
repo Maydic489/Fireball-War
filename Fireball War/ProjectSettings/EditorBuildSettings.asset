@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Fireball War Folder/Scenes/HostScene.unity
     guid: 75d42ee14236a76409dae91471d12b0c
+  - enabled: 1
+    path: Assets/Fireball War Folder/Scenes/Gameplay.unity
+    guid: 50d3cefc202ef314ab6cea79f2c9c6f8
   m_configObjects: {}

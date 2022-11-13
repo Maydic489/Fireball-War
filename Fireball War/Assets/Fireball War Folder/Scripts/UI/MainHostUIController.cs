@@ -62,6 +62,11 @@ public class MainHostUIController : NetworkBehaviour
         }
     }
 
+    public void RequestStartGame()
+    {
+        NetworkManager.SceneManager.LoadScene("Gameplay",UnityEngine.SceneManagement.LoadSceneMode.Single);
+    }
+
     public void HideHostingUI()
     {
         hostingUIGroup.SetActive(false); 

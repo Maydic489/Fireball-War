@@ -2675,7 +2675,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1900206274}
         m_TargetAssemblyTypeName: MainHostUIController, Assembly-CSharp
-        m_MethodName: CopyRoomCodeToClipboard
+        m_MethodName: RequestStartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2744,6 +2744,67 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -243}
   m_SizeDelta: {x: 291.6194, y: 64.19}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1001 &1858332285
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902377, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902378, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: m_Name
+      value: NetworkGameManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 4933645535021902379, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1724549566
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a8286051fc5857c468373fe2fc184e6a, type: 3}
 --- !u!1 &1861932757
 GameObject:
   m_ObjectHideFlags: 0
