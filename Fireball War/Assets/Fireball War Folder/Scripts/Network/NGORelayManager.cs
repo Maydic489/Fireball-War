@@ -143,6 +143,7 @@ public class NGORelayManager : MonoBehaviour
         }
 
         MainHostUIController.Instance.localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>();
+        MainNetworkGameManager.Instance.localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>();
         MainHostUIController.Instance.localPlayer.SetPlayerNameServerRpc(MainHostUIController.Instance.playerNameInputField.text);
         MainHostUIController.Instance.HideHostingUI();
         MainHostUIController.Instance.ShowWaitingRoomUI();
@@ -205,6 +206,7 @@ public class NGORelayManager : MonoBehaviour
         }
 
         MainHostUIController.Instance.localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>();
+        MainNetworkGameManager.Instance.localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>();
         MainHostUIController.Instance.localPlayer.SetPlayerNameServerRpc(MainHostUIController.Instance.playerNameInputField.text);
         MainHostUIController.Instance.HideHostingUI();
         MainHostUIController.Instance.ShowWaitingRoomUI();

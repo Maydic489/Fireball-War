@@ -5,6 +5,9 @@ using Unity.Netcode;
 
 public class MainNetworkGameManager : NetworkBehaviour
 {
+    [HideInInspector]
+    public PlayerNetwork localPlayer;
+
     public static MainNetworkGameManager Instance { get; private set; }
     private void Awake()
     {
@@ -22,7 +25,7 @@ public class MainNetworkGameManager : NetworkBehaviour
 
     private void OnLevelWasLoaded(int level)
     {
-        if (IsHost)
+        if (IsHost || IsClient)
             Time.timeScale = 0;
     }
 
@@ -37,14 +40,21 @@ public class MainNetworkGameManager : NetworkBehaviour
 
     private void onLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
     {
-        Debug.Log("sync complete");
+        var ping = localPlayer.gameObject.GetComponent<Unity.BossRoom.Utils.NetworkStats>().m_UtpRTT.Average;
+        Debug.Log("ping " + ping+" "+ (ping / 2f) / 1000f);
         ResumeGameServerRpc();
+        StartCoroutine(DelayResumeGame((ping / 2f) / 1000f));
+    }
+
+    IEnumerator DelayResumeGame(float delayTime)
+    {
+        yield return new WaitForSecondsRealtime(delayTime);
+        Time.timeScale = 1;
     }
 
     [ServerRpc(RequireOwnership = false)]
     void ResumeGameServerRpc()
     {
-        Debug.Log("Resume");
         Time.timeScale = 1;
     }
 }
