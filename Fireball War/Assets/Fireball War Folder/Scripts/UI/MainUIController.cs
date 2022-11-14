@@ -46,4 +46,13 @@ public class MainUIController : MonoBehaviour
 
         MainGameManager.Instance.StartFighting();
     }
+
+    public void PressLButton()
+    {
+        MainGameManager.Instance.PressL();
+    }
+    public void PressHButton()
+    {
+        MainGameManager.Instance.PressH();
+    }
 }

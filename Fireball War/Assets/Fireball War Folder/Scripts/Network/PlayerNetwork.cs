@@ -19,11 +19,11 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if(IsLocalPlayer && IsClient && MainGameManager.Instance != null && MainGameManager.Instance._gameState == MainGameManager.GameState.Fighting)
         {
-            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Joystick1Button2))
+            if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Joystick1Button2) || MainGameManager.Instance.isPressL)
             {
                 currentInput = "fb1";
             }
-            else if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Joystick1Button3))
+            else if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Joystick1Button3) || MainGameManager.Instance.isPressH)
             {
                 currentInput = "fb2";
             }
@@ -32,18 +32,20 @@ public class PlayerNetwork : NetworkBehaviour
                 currentInput = "";
             }
 
-            if (!string.IsNullOrEmpty(currentInput))
+            if (/*!string.IsNullOrEmpty(currentInput)*/ true)
             {
                 StartCoroutine(MainNetworkGameManager.Instance.DelayUpdatePlayerInput(currentInput, IsHost));
-                SendInputServerRpc(currentInput, IsHost);
+                SendInputServerRpc(currentInput, MainNetworkGameManager.Instance.currentFrame, IsHost);
             }
+
+            MainGameManager.Instance.ClearPressButtons();
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void SendInputServerRpc(string currentInput, bool isPlayer1)
+    void SendInputServerRpc(string currentInput, int clientFrame, bool isPlayer1)
     {
-        MainNetworkGameManager.Instance.UpdatePlayerInputClientRpc(currentInput, isPlayer1);
+        MainNetworkGameManager.Instance.UpdatePlayerInputClientRpc(currentInput, clientFrame, isPlayer1);
     }
 
     public override void OnNetworkSpawn()
@@ -78,6 +80,8 @@ public class PlayerNetwork : NetworkBehaviour
             MainHostUIController.Instance.SetPlayerSlotName(playerName, NetworkObject.IsOwnedByServer);
         }
     }
+
+
 
     ClientRpcParams GetClientParam(ulong clientId)
     {

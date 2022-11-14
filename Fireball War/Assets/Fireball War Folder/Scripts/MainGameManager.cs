@@ -23,6 +23,9 @@ public class MainGameManager : MonoBehaviour
     [HideInInspector]
     public int frameSinceImpact;
 
+    public bool isPressL;
+    public bool isPressH;
+
     public enum GameState
     {
         PreStart,
@@ -107,5 +110,20 @@ public class MainGameManager : MonoBehaviour
 
             frameSinceImpact++;
         }
+    }
+
+
+    public void PressL()
+    {
+        isPressL = true;
+    }
+    public void PressH()
+    {
+        isPressH = true;
+    }
+    public void ClearPressButtons()
+    {
+        isPressL = false;
+        isPressH = false;
     }
 }

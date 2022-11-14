@@ -11,6 +11,9 @@ public class MainNetworkGameManager : NetworkBehaviour
     public string p1CurrentInput;
     public string p2CurrentInput;
 
+    public InputData P1InputData = new InputData();
+    public InputData P2InputData = new InputData();
+
     [SerializeReference]
     public float currentPing;
     public int currentDelay;
@@ -41,6 +44,11 @@ public class MainNetworkGameManager : NetworkBehaviour
         {
             Time.timeScale = 0;
             ClearCurrentInput(true, true);
+
+            if (IsHost)
+                currentFrame = -1;
+            else
+                currentFrame = 0;
             //StartCoroutine(ClearCurrentInput());
         }
     }
@@ -51,7 +59,6 @@ public class MainNetworkGameManager : NetworkBehaviour
 
         if (IsClient && !IsHost)
         {
-            Debug.Log("subscribe");
             NetworkManager.Singleton.SceneManager.OnLoadComplete += onLoadComplete; ;
         }
     }
@@ -82,16 +89,65 @@ public class MainNetworkGameManager : NetworkBehaviour
 
     private void Update()
     {
+        if ((IsHost || IsClient) && MainGameManager.Instance != null && MainGameManager.Instance._gameState != MainGameManager.GameState.PreStart)
+        {
+            if (IsHost)
+            {
+                if (P2InputData.Frame != 0 && P2InputData.Frame + currentDelay < currentFrame && Time.timeScale != 0)
+                {
+                    Debug.Log("stop time host");
+                    Time.timeScale = 0;
+                }
+                else if (P2InputData.Frame + currentDelay >= currentFrame && Time.timeScale == 0)
+                {
+                    Debug.Log("resume time host");
+                    Time.timeScale = 1;
+                }
+            }
+            else
+            {
+                if (P1InputData.Frame != 0 && P1InputData.Frame + currentDelay < currentFrame && Time.timeScale != 0)
+                {
+                    Debug.Log("stop time client");
+                    Time.timeScale = 0;
+                }
+                else if (P1InputData.Frame + currentDelay >= currentFrame && Time.timeScale == 0)
+                {
+                    Debug.Log("resume time client");
+                    Time.timeScale = 1;
+                }
+            }
+        }
 
+        if (MainGameManager.Instance != null && Time.timeScale == 1)
+        {
+            currentFrame++;
+            Debug.Log("count frame " + currentFrame);
+        }
     }
 
     [ClientRpc]
-    public void UpdatePlayerInputClientRpc(string newInput,bool isPlayer1)
+    public void UpdatePlayerInputClientRpc(string newInput, int frame,bool isPlayer1)
+    {
+        UpdatePlayerInput(newInput,frame,isPlayer1);
+    }
+
+    void UpdatePlayerInput(string newInput, int frame, bool isPlayer1)
     {
         if (isPlayer1 && !IsHost)
+        {
             p1CurrentInput = newInput;
-        else if(!isPlayer1 && IsHost)
+            P1InputData.input = newInput;
+            P1InputData.Frame = frame;
+            Debug.Log("update input " + (frame + currentDelay));
+        }
+        else if (!isPlayer1 && IsHost)
+        {
             p2CurrentInput = newInput;
+            P2InputData.input = newInput;
+            P2InputData.Frame = frame;
+            Debug.Log("update input " + (frame + currentDelay));
+        }
     }
 
     public IEnumerator DelayUpdatePlayerInput(string newInput, bool isPlayer1)//local delay so the other player see the same timing
@@ -170,4 +226,10 @@ public class MainNetworkGameManager : NetworkBehaviour
 
         return clientRpcParams;
     }
+}
+
+public class InputData
+{
+    public string input;
+    public int Frame;
 }
