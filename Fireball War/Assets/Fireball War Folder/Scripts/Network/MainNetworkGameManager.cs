@@ -11,6 +11,12 @@ public class MainNetworkGameManager : NetworkBehaviour
     public string p1CurrentInput;
     public string p2CurrentInput;
 
+    [SerializeReference]
+    public float currentPing;
+
+    public bool isInputUsedP1;
+    public bool isInputUsedP2;
+
     public static MainNetworkGameManager Instance { get; private set; }
     private void Awake()
     {
@@ -31,7 +37,7 @@ public class MainNetworkGameManager : NetworkBehaviour
         if (IsHost || IsClient)
         {
             Time.timeScale = 0;
-            StartCoroutine(ClearCurrentInput());
+            //StartCoroutine(ClearCurrentInput());
         }
     }
 
@@ -64,24 +70,42 @@ public class MainNetworkGameManager : NetworkBehaviour
         Time.timeScale = 1;
     }
 
+    private void Update()
+    {
+        if (NetworkManager.Singleton.IsClient)
+        {
+            var ping = localPlayer.gameObject.GetComponent<Unity.BossRoom.Utils.NetworkStats>().m_UtpRTT.Average;
+            currentPing = (ping / 2f) / 1000f;
+        }
+    }
+
     [ClientRpc]
     public void UpdatePlayerInputClientRpc(string newInput,bool isPlayer1)
     {
-        if (isPlayer1)
+        if (isPlayer1 && !IsHost)
             p1CurrentInput = newInput;
-        else
+        else if(!isPlayer1 && IsHost)
             p2CurrentInput = newInput;
     }
 
-    IEnumerator ClearCurrentInput()
+    public IEnumerator DelayUpdatePlayerInput(string newInput, bool isPlayer1)
     {
-        while (true)
-        {
-            yield return new WaitForEndOfFrame();
+        yield return new WaitForSecondsRealtime(currentPing);
 
+        Debug.Log("wait realtime");
+
+        if (isPlayer1)
+            MainNetworkGameManager.Instance.p1CurrentInput = newInput;
+        else
+            MainNetworkGameManager.Instance.p2CurrentInput = newInput;
+    }
+
+    public void ClearCurrentInput(bool isPlayer1)
+    {
+        if (isPlayer1)
             p1CurrentInput = "";
+        else
             p2CurrentInput = "";
-        }
     }
 
     [ServerRpc(RequireOwnership = false)]

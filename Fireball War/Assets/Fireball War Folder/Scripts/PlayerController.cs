@@ -149,6 +149,8 @@ public class PlayerController : MonoBehaviour
                     }
                 }
             }
+
+            MainNetworkGameManager.Instance.ClearCurrentInput(isPlayer1Side);
         }
     }
 

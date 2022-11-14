@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class MainBGM : MonoBehaviour
 {
+    [SerializeField]
+    AudioSource _audioSource;
+
     public static MainBGM Instance { get; private set; }
     private void Awake()
     {
@@ -22,10 +25,19 @@ public class MainBGM : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Q))
         {
-            if(GetComponent<AudioSource>().isPlaying)
-                GetComponent<AudioSource>().Stop();
+            if(_audioSource.isPlaying)
+                _audioSource.Stop();
             else
-                GetComponent<AudioSource>().Play();
+                _audioSource.Play();
+        }
+
+        if(Time.timeScale == 0 && _audioSource.isPlaying)
+        {
+            _audioSource.Pause();
+        }
+        else if(Time.timeScale != 0 && !_audioSource.isPlaying)
+        {
+            _audioSource.UnPause();
         }
     }
 }

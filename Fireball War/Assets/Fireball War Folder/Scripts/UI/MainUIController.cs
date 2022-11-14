@@ -29,6 +29,8 @@ public class MainUIController : MonoBehaviour
 
     IEnumerator ReadyAnnounce()
     {
+        yield return new WaitWhile(() => Time.timeScale == 0);
+
         Animation readyAnim = readyText.GetComponent<Animation>();
 
         readyText.GetComponent<Animation>().Play("ReadySlowExpand");

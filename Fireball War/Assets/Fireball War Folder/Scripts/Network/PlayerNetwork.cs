@@ -33,7 +33,10 @@ public class PlayerNetwork : NetworkBehaviour
             }
 
             if (!string.IsNullOrEmpty(currentInput))
+            {
+                StartCoroutine(MainNetworkGameManager.Instance.DelayUpdatePlayerInput(currentInput, IsHost));
                 SendInputServerRpc(currentInput, IsHost);
+            }
         }
     }
 
