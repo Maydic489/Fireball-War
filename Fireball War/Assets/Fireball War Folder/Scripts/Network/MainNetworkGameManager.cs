@@ -13,8 +13,11 @@ public class MainNetworkGameManager : NetworkBehaviour
 
     [SerializeReference]
     public float currentPing;
+    public int currentDelay;
+    public int currentFrame;
 
     public float startPingTimer;
+    public int startPingFrame;
     public bool isServer;
 
     public static MainNetworkGameManager Instance { get; private set; }
@@ -37,6 +40,7 @@ public class MainNetworkGameManager : NetworkBehaviour
         if (IsHost || IsClient)
         {
             Time.timeScale = 0;
+            ClearCurrentInput(true, true);
             //StartCoroutine(ClearCurrentInput());
         }
     }
@@ -55,12 +59,18 @@ public class MainNetworkGameManager : NetworkBehaviour
     private void onLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
     {
         ResumeGameServerRpc();
-        StartCoroutine(DelayResumeGame((currentPing) / 1000f));
+        StartCoroutine(DelayResumeGame());
     }
 
-    IEnumerator DelayResumeGame(float delayTime)
+    IEnumerator DelayResumeGame()
     {
-        yield return new WaitForSecondsRealtime(delayTime);
+        int latestDelay = currentDelay;
+
+        for (int i = 0; i < latestDelay; i++)
+        {
+            yield return null;
+        }
+
         Time.timeScale = 1;
     }
 
@@ -86,7 +96,12 @@ public class MainNetworkGameManager : NetworkBehaviour
 
     public IEnumerator DelayUpdatePlayerInput(string newInput, bool isPlayer1)//local delay so the other player see the same timing
     {
-        yield return new WaitForSecondsRealtime(currentPing);
+        int latestDelay = currentDelay;
+
+        for(int i=0;i<latestDelay;i++)
+        {
+            yield return null;
+        }
 
         if (isPlayer1)
             MainNetworkGameManager.Instance.p1CurrentInput = newInput;
@@ -94,12 +109,18 @@ public class MainNetworkGameManager : NetworkBehaviour
             MainNetworkGameManager.Instance.p2CurrentInput = newInput;
     }
 
-    public void ClearCurrentInput(bool isPlayer1)
+    public void ClearCurrentInput(bool isPlayer1, bool clearAll = false)
     {
         if (isPlayer1)
             p1CurrentInput = "";
         else
             p2CurrentInput = "";
+
+        if(clearAll)
+        {
+            p1CurrentInput = "";
+            p2CurrentInput = "";
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -111,6 +132,7 @@ public class MainNetworkGameManager : NetworkBehaviour
     public void PingCalculateStart()
     {
         startPingTimer = Time.timeSinceLevelLoad;
+        startPingFrame = Time.frameCount;
         SendPingServerRpc();
     }
 
@@ -129,6 +151,10 @@ public class MainNetworkGameManager : NetworkBehaviour
     {
         currentPing = (Time.timeSinceLevelLoad - startPingTimer) / 2;
         startPingTimer = Time.timeSinceLevelLoad;
+        currentDelay = (Time.frameCount - startPingFrame) / 2;
+        startPingFrame = Time.frameCount;
+
+        //Debug.Log("Delay " + currentDelay);
         SendPingServerRpc();
     }
 

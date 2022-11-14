@@ -17,7 +17,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void Update()
     {
-        if(IsLocalPlayer && IsClient)
+        if(IsLocalPlayer && IsClient && MainGameManager.Instance != null && MainGameManager.Instance._gameState == MainGameManager.GameState.Fighting)
         {
             if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Joystick1Button2))
             {
