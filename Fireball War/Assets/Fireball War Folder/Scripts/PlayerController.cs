@@ -281,7 +281,8 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.5f);
 
-        if (!MainGameManager.Instance.isOnlinePlay)
+        //check if Online or Offline
+        if (!MainGameManager.Instance.isOnlinePlay && MainNetworkGameManager.Instance.isServer)
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         else
             MainNetworkGameManager.Instance.RestartGamePlayServerRpc();

@@ -14,8 +14,8 @@ public class MainNetworkGameManager : NetworkBehaviour
     [SerializeReference]
     public float currentPing;
 
-    public bool isInputUsedP1;
-    public bool isInputUsedP2;
+    public float startPingTimer;
+    public bool isServer;
 
     public static MainNetworkGameManager Instance { get; private set; }
     private void Awake()
@@ -43,6 +43,8 @@ public class MainNetworkGameManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        isServer = NetworkManager.Singleton.IsServer;
+
         if (IsClient && !IsHost)
         {
             Debug.Log("subscribe");
@@ -52,10 +54,8 @@ public class MainNetworkGameManager : NetworkBehaviour
 
     private void onLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
     {
-        var ping = localPlayer.gameObject.GetComponent<Unity.BossRoom.Utils.NetworkStats>().m_UtpRTT.Average;
-        Debug.Log("ping " + ping+" "+ (ping / 2f) / 1000f);
         ResumeGameServerRpc();
-        StartCoroutine(DelayResumeGame((ping / 2f) / 1000f));
+        StartCoroutine(DelayResumeGame((currentPing) / 1000f));
     }
 
     IEnumerator DelayResumeGame(float delayTime)
@@ -72,11 +72,7 @@ public class MainNetworkGameManager : NetworkBehaviour
 
     private void Update()
     {
-        if (NetworkManager.Singleton.IsClient)
-        {
-            var ping = localPlayer.gameObject.GetComponent<Unity.BossRoom.Utils.NetworkStats>().m_UtpRTT.Average;
-            currentPing = (ping / 2f) / 1000f;
-        }
+
     }
 
     [ClientRpc]
@@ -88,11 +84,9 @@ public class MainNetworkGameManager : NetworkBehaviour
             p2CurrentInput = newInput;
     }
 
-    public IEnumerator DelayUpdatePlayerInput(string newInput, bool isPlayer1)
+    public IEnumerator DelayUpdatePlayerInput(string newInput, bool isPlayer1)//local delay so the other player see the same timing
     {
         yield return new WaitForSecondsRealtime(currentPing);
-
-        Debug.Log("wait realtime");
 
         if (isPlayer1)
             MainNetworkGameManager.Instance.p1CurrentInput = newInput;
@@ -112,5 +106,42 @@ public class MainNetworkGameManager : NetworkBehaviour
     public void RestartGamePlayServerRpc()
     {
         NetworkManager.SceneManager.LoadScene("Gameplay", UnityEngine.SceneManagement.LoadSceneMode.Single);
+    }
+
+    public void PingCalculateStart()
+    {
+        startPingTimer = Time.timeSinceLevelLoad;
+        SendPingServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SendPingServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        var clientId = serverRpcParams.Receive.SenderClientId;
+        if (clientId == 0)
+            RecievPingClientRpc(GetClientParam(1));
+        else if(clientId == 1)
+            RecievPingClientRpc(GetClientParam(0));
+    }
+
+    [ClientRpc]
+    void RecievPingClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        currentPing = (Time.timeSinceLevelLoad - startPingTimer) / 2;
+        startPingTimer = Time.timeSinceLevelLoad;
+        SendPingServerRpc();
+    }
+
+    ClientRpcParams GetClientParam(ulong clientId)
+    {
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { clientId }
+            }
+        };
+
+        return clientRpcParams;
     }
 }

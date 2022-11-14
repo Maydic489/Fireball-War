@@ -59,6 +59,7 @@ public class MainHostUIController : NetworkBehaviour
             NetworkManager.Singleton.OnClientConnectedCallback -= OnNewPlayerConnect;
 
             startButton.interactable = true;
+            MainNetworkGameManager.Instance.PingCalculateStart();
         }
     }
 
